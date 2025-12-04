@@ -1,73 +1,109 @@
-# React + TypeScript + Vite
+# React + Strapi Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a modern frontend application built with React 19, TypeScript, and Vite. It communicates with a Strapi backend via GraphQL, featuring dynamic page rendering, efficient caching, and a modular component architecture.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Table of Contents
+- [Project Overview](#project-overview)
+- [Features](#features)
+- [Folder Structure](#folder-structure)
+- [Setup & Scripts](#setup--scripts)
+- [Key Dependencies](#key-dependencies)
+- [Caching Strategy](#caching-strategy)
+- [Development Notes](#development-notes)
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Project Overview
+This project serves as the frontend for a content-driven platform powered by Strapi. It fetches and renders dynamic pages, supports highly performant caching using memory and IndexedDB, and leverages code-splitting and modern React features for a smooth user experience.
 
-## Expanding the ESLint configuration
+## Features
+- **React 19** with Suspense & lazy loading
+- **TypeScript** with strict type checking
+- **Vite** for fast development and building
+- **GraphQL** queries via Apollo Client
+- **Dynamic routing** with React Router
+- **Component-driven architecture** (layout, UI, sections, etc.)
+- **Flexible caching**: memory + IndexedDB with configurable TTL
+- **Modern CSS** setup (App.css)
+- **Strong ESLint config** for code quality
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Folder Structure
+```
+frontend/
+├── public/            # Static assets
+├── src/
+│   ├── App.tsx        # Main routing and entry
+│   ├── App.css        # Global styles
+│   ├── main.tsx       # Vite entry point
+│   ├── assets/        # Images, icons, etc.
+│   ├── components/    # Modular, reusable components
+│   │   ├── layout/    # Layout, Navbar, Loading
+│   │   ├── providers/ # Context providers
+│   │   ├── sections/  # Section-based page content
+│   │   └── ui/        # UI elements (Image, PageCard, ...)
+│   ├── constants/     # GraphQL & API constants
+│   ├── helpers/       # Helper utilities
+│   ├── hooks/         # Custom React hooks (e.g. useQuery)
+│   │   └── cache/     # Caching logic (memory/IDB)
+│   ├── pages/         # Route-based pages: Home, DynamicPages, NotFound
+│   ├── query/         # GraphQL query strings
+│   ├── types/         # TypeScript types
+│   └── utils/         # App utilities (Apollo client, image helpers)
+├── package.json       # Dependencies & scripts
+├── tsconfig.*.json    # TS config
+├── vite.config.ts     # Vite config
+├── eslint.config.js   # ESLint config
+└── README.md
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Setup & Scripts
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+2. **Run in development**:
+   ```bash
+   npm run dev
+   ```
+3. **Production build**:
+   ```bash
+   npm run build
+   ```
+4. **Preview production build**:
+   ```bash
+   npm run preview
+   ```
+5. **Lint code**:
+   ```bash
+   npm run lint
+   ```
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Key Dependencies
+- `react`, `react-dom` & `react-router-dom`
+- `@apollo/client` & `graphql`
+- `idb` (IndexedDB wrapper)
+- `vite`
+- `eslint` w/ React + TypeScript plugins
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Caching Strategy
+This project implements a two-tier cache for GraphQL queries:
+- **In-memory**: quick access, fast eviction for up to 50 items
+- **IndexedDB (idb)**: persistent cache in browser for up to 500 items
+- **TTL purging**: both caches are periodically cleaned based on a time-to-live (TTL)
+- **Custom hook**: see `src/hooks/useQuery.ts` for details
+
+## Routing Structure
+- `/` renders the homepage with a grid of pages
+- `/:slug` loads a dynamic page based on the slug (from Strapi)
+- `*` displays a NotFound page
+
+## Development Notes
+- Update `VITE_BACKEND_BASE_URL` in your `.env` file to target the correct Strapi backend.
+- Code splitting is enabled via `React.lazy`/`Suspense` for pages & layout.
+- Customize/add sections, UI, or page types in their respective folders.
+- Lint your code before committing to maintain code quality.
+
+---
+Feel free to contribute or extend for your needs!
