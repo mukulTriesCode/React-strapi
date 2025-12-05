@@ -1,11 +1,11 @@
 import { useParams } from "react-router-dom";
 import type { RFCType, PagesResponse } from "../types";
-import { PAGE_QUERY } from "../query/PageQuery";
+import { PAGE_QUERY } from "../graphql/query/PageQuery";
 import Image from "../components/ui/Image";
 import NotFound from "./NotFound";
 import Loading from "../components/layout/Loading";
 import { renderComponent } from "../helpers/renderComponent";
-import { useQuery } from "../hooks/useQuery";
+import { useQuery } from "../graphql/hooks/useQuery";
 import React, { useMemo } from "react";
 
 const DynamicPages: RFCType = () => {

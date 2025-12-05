@@ -1,16 +1,16 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { GRAPHQL_URL } from "../constants/api";
-import { getCacheKey } from "./cache/utils";
+import { GRAPHQL_URL } from "../../constants/api";
+import { getCacheKey } from "../utils";
 import {
   setMemoryCache,
   getMemoryCache,
   purgeExpiredMemory,
-} from "./cache/memory";
+} from "../cache/memory";
 import {
   getIndexedDBCache,
   setIndexedDBCache,
   purgeExpiredIndexedDB,
-} from "./cache/indexedDB";
+} from "../cache/indexedDB";
 
 type UseQueryOptions = {
   variables?: Record<string, unknown>;

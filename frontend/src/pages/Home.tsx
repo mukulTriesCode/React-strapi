@@ -1,8 +1,8 @@
 import type { RFCType, PagesResponse } from "../types";
-import { PAGES_QUERY } from "../query/PagesQuery";
+import { PAGES_QUERY } from "../graphql/query/PagesQuery";
 import PageCard from "../components/ui/PageCard";
 import Loading from "../components/layout/Loading";
-import { useQuery } from "../hooks/useQuery";
+import { useQuery } from "../graphql/hooks/useQuery";
 
 const Home: RFCType = () => {
   const { data, loading, error } = useQuery<PagesResponse>(PAGES_QUERY, {
