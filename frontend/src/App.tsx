@@ -1,6 +1,8 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import "./App.css";
+import { GraphQLProvider } from "./graphql/client/GraphqlProvider";
+import { GRAPHQL_URL } from "./constants/api";
 
 const Layout = lazy(() => import("./components/layout/Layout"));
 const Home = lazy(() => import("./pages/Home"));
@@ -13,8 +15,10 @@ function App() {
       <Suspense fallback={<></>}>
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
-            <Route path="/:slug" element={<DynamicPages />} />
+            <GraphQLProvider endpoint={GRAPHQL_URL}>
+              <Route index element={<Home />} />
+              <Route path="/:slug" element={<DynamicPages />} />
+            </GraphQLProvider>
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
