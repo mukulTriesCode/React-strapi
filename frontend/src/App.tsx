@@ -11,19 +11,19 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 
 function App() {
   return (
-    <Router>
-      <Suspense fallback={<></>}>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <GraphQLProvider endpoint={GRAPHQL_URL}>
+    <GraphQLProvider endpoint={GRAPHQL_URL}>
+      <Router>
+        <Suspense fallback={<></>}>
+          <Routes>
+            <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
               <Route path="/:slug" element={<DynamicPages />} />
-            </GraphQLProvider>
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
-      </Suspense>
-    </Router>
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Routes>
+        </Suspense>
+      </Router>
+    </GraphQLProvider>
   );
 }
 
