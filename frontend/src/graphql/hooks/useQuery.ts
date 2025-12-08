@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { GRAPHQL_URL } from "../../constants/api";
 import { getCacheKey } from "../utils";
 import {
   setMemoryCache,
@@ -11,6 +10,7 @@ import {
   setIndexedDBCache,
   purgeExpiredIndexedDB,
 } from "../cache/indexedDB";
+import { useGraphQLClient } from "../client/GraphQLContext";
 
 type UseQueryOptions = {
   variables?: Record<string, unknown>;
@@ -36,6 +36,7 @@ export function useQuery<T = unknown>(
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const client = useGraphQLClient();
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const cleanupRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const cacheKey = getCacheKey(query, options?.variables);
@@ -50,20 +51,16 @@ export function useQuery<T = unknown>(
         if (memory) setData(memory.data as T);
       }
 
-      const res = await fetch(GRAPHQL_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query, variables: options?.variables }),
-      });
-      const json = (await res.json()) as { data?: T; errors?: unknown };
-      if (json.errors) throw new Error(JSON.stringify(json.errors));
+      const result = await client.request<T, Record<string, unknown> | undefined>(
+        query,
+        options?.variables
+      );
 
-      if (json.data) {
-        setData(json.data);
-
+      if (result) {
+        setData(result);
         if (options?.cache) {
-          setMemoryCache(cacheKey, json.data);
-          await setIndexedDBCache(cacheKey, json.data);
+          setMemoryCache(cacheKey, result);
+          await setIndexedDBCache(cacheKey, result);
         }
       }
     } catch (err: unknown) {
@@ -72,7 +69,7 @@ export function useQuery<T = unknown>(
     } finally {
       setLoading(false);
     }
-  }, [query, cacheKey, options?.variables, options?.cache]);
+  }, [client, query, cacheKey, options?.variables, options?.cache]);
 
   useEffect(() => {
     let cancelled = false;
@@ -115,7 +112,6 @@ export function useQuery<T = unknown>(
     options?.cacheTTL,
   ]);
 
-  // polling
   useEffect(() => {
     if (options?.pollInterval && options.pollInterval > 0) {
       pollRef.current = setInterval(fetchData, options.pollInterval);
@@ -125,7 +121,6 @@ export function useQuery<T = unknown>(
     }
   }, [fetchData, options?.pollInterval]);
 
-  // background cleanup
   useEffect(() => {
     if (options?.cache && options?.cleanupInterval) {
       cleanupRef.current = setInterval(async () => {

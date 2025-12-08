@@ -40,7 +40,7 @@ const DynamicPages: RFCType = () => {
     <>
       <section className="container">
         <div className="wrapper-block">
-          <h1>{Title}</h1>
+          {Title && <h1>{Title}</h1>}
           <Image
             src={ThumbnailImage}
             rounded
@@ -48,7 +48,7 @@ const DynamicPages: RFCType = () => {
             priority
             hasMargin
           />
-          <p style={{ fontSize: "24px" }}>{Description}</p>
+          {Description && <p style={{ fontSize: "24px" }}>{Description}</p>}
         </div>
       </section>
       {Sections?.map((section, index) => (
